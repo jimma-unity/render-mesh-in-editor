@@ -24,7 +24,12 @@ public class RenderMeshInSceneView : MonoBehaviour
         //    material = new Material(shader);
         //}
 
-        SceneView.duringSceneGui += OnSceneGUI;
+        //SceneView.duringSceneGui += OnSceneGUI;
+    }
+
+    void OnDestroy()
+    {
+        Debug.Log("ONDESTROY");
     }
 
     void LogPasses()
@@ -35,8 +40,11 @@ public class RenderMeshInSceneView : MonoBehaviour
 
     void OnDrawGizmos()
     {
-        material.SetPass(0);
-        Graphics.DrawMeshNow(mesh, Vector3.zero, Quaternion.identity);
+        if (mesh && material)
+        {
+            material.SetPass(0);
+            Graphics.DrawMeshNow(mesh, Vector3.zero, Quaternion.identity);
+        }
 
         //Matrix4x4[] matrices = new Matrix4x4[] { Matrix4x4.identity };
         //Graphics.DrawMeshInstanced(mesh, 0, material, matrices, 1);
@@ -45,7 +53,7 @@ public class RenderMeshInSceneView : MonoBehaviour
 
     void OnSceneGUI(SceneView view)
     {
-        EditorUtility.SetDirty(view);
+        //EditorUtility.SetDirty(view);
     }
 }
 
