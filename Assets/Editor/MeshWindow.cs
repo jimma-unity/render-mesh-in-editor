@@ -1,9 +1,11 @@
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class MeshhWindow : EditorWindow
 {
     private GameObject meshRenderer;
+    private Toggle toggle;
 
     [MenuItem("Tools/Mesh")]
     public static void ShowMeshWindow()
@@ -13,19 +15,21 @@ public class MeshhWindow : EditorWindow
         wnd.titleContent = new GUIContent("Mesh");
     }
 
-    void OnEnable()
+    void Awake()
     {
-        meshRenderer = new GameObject();
+        toggle = new Toggle("Test Toggle") { name = "My Toggle" };
+        rootVisualElement.Add(toggle);
+
+        meshRenderer = new GameObject("RenderMeshInSceneView");
         meshRenderer.AddComponent<RenderMeshInSceneView>();
         RenderMeshInSceneView rmisv = meshRenderer.GetComponent<RenderMeshInSceneView>();
         rmisv.Setup();
-        //Debug.Log("ENABLE");
     }
 
-    void OnDisable()
+    void OnDestroy()
     {
         DestroyImmediate(meshRenderer);
-        //Debug.Log("DISABLE");
+        meshRenderer = null;
     }
 }
 
