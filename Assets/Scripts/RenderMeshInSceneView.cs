@@ -2,20 +2,18 @@
 
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class RenderMeshInSceneView : MonoBehaviour
 {
     private Mesh mesh;
     private Material material;
+    private Toggle toggle;
 
-    public void Setup()
+    public void Setup(Material mat)
     {
         mesh = CreateMesh.CreatePlane();
-        
-        GameObject go = (GameObject)Instantiate(Resources.Load("VertexColorCube"));
-        material = new Material(go.GetComponent<Renderer>().sharedMaterial);
-        material.enableInstancing = true;
-        DestroyImmediate(go);
+        material = mat;
         // This doesn't work (if you assign a material to a GameObject in-editor it works, if you create it in script here it doesn't).
         // Seems to be a bug when you create a Material in script this way.
         //Shader shader = Shader.Find("Shader Graphs/VertexColor");
@@ -26,10 +24,16 @@ public class RenderMeshInSceneView : MonoBehaviour
 
         //SceneView.duringSceneGui += OnSceneGUI;
     }
+    public void CreateGUI(VisualElement rootVisualElement)
+    {
+        toggle = new Toggle("Render Mesh") { name = "RenderMesh" };
+        toggle.RegisterValueChangedCallback(OnToggleValueChanged);
+        rootVisualElement.Add(toggle);
+    }
 
     void OnDestroy()
     {
-        Debug.Log("ONDESTROY");
+        toggle.UnregisterValueChangedCallback(OnToggleValueChanged);
     }
 
     void LogPasses()
@@ -38,22 +42,21 @@ public class RenderMeshInSceneView : MonoBehaviour
             Debug.Log(material.GetPassName(i));
     }
 
+    private void OnToggleValueChanged(ChangeEvent<bool> evt)
+    {
+        //Debug.Log(toggle.value);
+        // Force repaint of SceneView otherwise Mesh will only appear/disappear once you Mouse over the SceneView window.
+        EditorWindow view = EditorWindow.GetWindow<SceneView>();
+        view.Repaint();
+    }
+
     void OnDrawGizmos()
     {
-        if (mesh && material)
+        if (toggle != null && toggle.value && mesh != null && material != null)
         {
             material.SetPass(0);
             Graphics.DrawMeshNow(mesh, Vector3.zero, Quaternion.identity);
         }
-
-        //Matrix4x4[] matrices = new Matrix4x4[] { Matrix4x4.identity };
-        //Graphics.DrawMeshInstanced(mesh, 0, material, matrices, 1);
-        //Graphics.DrawMeshInstancedProcedural(mesh, 0, material, mesh.bounds, 1);
-    }
-
-    void OnSceneGUI(SceneView view)
-    {
-        //EditorUtility.SetDirty(view);
     }
 }
 

@@ -1,5 +1,6 @@
 using UnityEditor.ShaderGraph;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class RenderMeshInPlayMode : MonoBehaviour
 {
@@ -22,11 +23,11 @@ public class RenderMeshInPlayMode : MonoBehaviour
 
     void OnDrawGizmos()
     {
-        if (mesh && material)
-        {
-            material.SetPass(0);
-            Graphics.DrawMeshNow(mesh, Vector3.zero, Quaternion.identity);
-        }
+        //if (mesh && material)
+        //{
+        //    material.SetPass(0);
+        //    Graphics.DrawMeshNow(mesh, Vector3.zero, Quaternion.identity);
+        //}
 
         //Matrix4x4[] matrices = new Matrix4x4[] { Matrix4x4.identity };
         //Graphics.DrawMeshInstanced(mesh, 0, material, matrices, 1);
