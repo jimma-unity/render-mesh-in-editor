@@ -6,6 +6,7 @@ public class RenderMeshInPlayMode : MonoBehaviour
 {
     public Material material;
     private Mesh mesh;
+    private TextMesh textMesh;
     private Material matty;
     private Vector3 offset;
 
@@ -18,7 +19,14 @@ public class RenderMeshInPlayMode : MonoBehaviour
             matty = new Material(shader);
             //matty.CopyPropertiesFromMaterial(material);
         }
-        offset = new Vector3(0, 1, 0);
+        offset = new Vector3(2, 0, 0);
+        transform.position = transform.position + offset;
+        if (gameObject.GetComponent<TextMesh>() == null)
+        {
+            TextMesh textmesh = gameObject.AddComponent<TextMesh>();
+            textmesh.text = "Game";
+            textmesh.anchor = TextAnchor.MiddleCenter;
+        }
     }
 
     void OnDrawGizmos()
@@ -42,7 +50,7 @@ public class RenderMeshInPlayMode : MonoBehaviour
         MaterialPropertyBlock matPropBlock = null;
         bool castShadows = false;
 
-        //Graphics.DrawMesh(mesh, Vector3.zero, Quaternion.identity, material, layer, camera, submeshIndex, matPropBlock, castShadows);
+        Graphics.DrawMesh(mesh, transform.position, transform.rotation, material, layer, camera, submeshIndex, matPropBlock, castShadows);
 
         //Graphics.DrawMesh(mesh, offset, Quaternion.identity, material, layer, camera, submeshIndex, matPropBlock, castShadows);
     }

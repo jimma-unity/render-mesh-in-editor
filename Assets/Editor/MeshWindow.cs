@@ -4,7 +4,7 @@ using UnityEngine.UIElements;
 
 public class MeshWindow : EditorWindow
 {
-    private static GameObject meshRenderer;
+    private GameObject meshRenderer;
 
     [MenuItem("Tools/Mesh")]
     public static void ShowMeshWindow()
@@ -30,8 +30,8 @@ public class MeshWindow : EditorWindow
     {
         DestroyRenderer();
         SetupRenderer();
-        RenderMeshInSceneView rmisv = meshRenderer.GetComponent<RenderMeshInSceneView>();
-        rmisv.CreateGUI(rootVisualElement);
+        //RenderMeshInSceneView rmisv = meshRenderer.GetComponent<RenderMeshInSceneView>();
+        //rmisv.CreateGUI(rootVisualElement);
     }
 
     private void OnGUI()
@@ -40,7 +40,7 @@ public class MeshWindow : EditorWindow
 
     void Awake()
     {
-        SetupRenderer();
+        //SetupRenderer();
     }
 
     void OnDestroy()
@@ -52,32 +52,41 @@ public class MeshWindow : EditorWindow
     {
     }
 
-    private static void SetupRenderer()
+    private void SetupRenderer()
     {
-        if (meshRenderer == null)
+        //RenderMeshInSceneView rmisv = new RenderMeshInSceneView();
+
+        //if (rmisv == null)
         {
             meshRenderer = new GameObject("RenderMeshInSceneView");
             meshRenderer.hideFlags = HideFlags.DontSave;
-            meshRenderer.AddComponent<RenderMeshInSceneView>();
-            RenderMeshInSceneView rmisv = meshRenderer.GetComponent<RenderMeshInSceneView>();
 
             GameObject go = (GameObject)Instantiate(Resources.Load("VertexColorCube"));
             Material mat = new Material(go.GetComponent<Renderer>().sharedMaterial);
             mat.enableInstancing = true;
             DestroyImmediate(go);
+
+            RenderMeshInSceneView rmisv = meshRenderer.AddComponent<RenderMeshInSceneView>();
             rmisv.Setup(mat);
+            rmisv.CreateGUI(rootVisualElement);
         }
     }
 
-    private static void DestroyRenderer()
+    private void DestroyRenderer()
     {
-        DestroyImmediate(meshRenderer);
-        meshRenderer = null;
+        RenderMeshInSceneView rmisv = meshRenderer ? meshRenderer.GetComponent<RenderMeshInSceneView>() : null;
+        if (rmisv != null)
+        {
+            rmisv.DestroyGUI(rootVisualElement);
+            DestroyImmediate(meshRenderer);
+            meshRenderer = null;
+        }
     }
 
     private static void PlayModeStateChanged(PlayModeStateChange state)
     {
         Debug.Log(state);
+        MeshWindow wnd = GetWindow<MeshWindow>();
         //if (state == PlayModeStateChange.ExitingEditMode)
         //{
         //    DestroyRenderer();
@@ -86,8 +95,8 @@ public class MeshWindow : EditorWindow
         //else
         if (state == PlayModeStateChange.EnteredEditMode)
         {
-            DestroyRenderer();
-            SetupRenderer();
+            wnd.DestroyRenderer();
+            wnd.SetupRenderer();
         }
     }
 }

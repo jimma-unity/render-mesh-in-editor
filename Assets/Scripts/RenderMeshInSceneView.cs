@@ -23,12 +23,29 @@ public class RenderMeshInSceneView : MonoBehaviour
         //}
 
         //SceneView.duringSceneGui += OnSceneGUI;
+        if (GetComponent<TextMesh>() == null)
+        {
+            TextMesh textmesh = gameObject.AddComponent<TextMesh>();
+            textmesh.text = "Scene";
+            textmesh.anchor = TextAnchor.MiddleCenter;
+        }
     }
     public void CreateGUI(VisualElement rootVisualElement)
     {
+        Debug.Log("RMISV::CreateGUI()");
         toggle = new Toggle("Render Mesh") { name = "RenderMesh" };
+        toggle.value = true;
         toggle.RegisterValueChangedCallback(OnToggleValueChanged);
         rootVisualElement.Add(toggle);
+    }
+
+    public void DestroyGUI(VisualElement rootVisualElement)
+    {
+        if (toggle != null)
+        {
+            toggle.UnregisterValueChangedCallback(OnToggleValueChanged);
+            rootVisualElement.Remove(toggle);
+        }
     }
 
     void OnDestroy()
@@ -44,7 +61,6 @@ public class RenderMeshInSceneView : MonoBehaviour
 
     private void OnToggleValueChanged(ChangeEvent<bool> evt)
     {
-        //Debug.Log(toggle.value);
         // Force repaint of SceneView otherwise Mesh will only appear/disappear once you Mouse over the SceneView window.
         EditorWindow view = EditorWindow.GetWindow<SceneView>();
         view.Repaint();
