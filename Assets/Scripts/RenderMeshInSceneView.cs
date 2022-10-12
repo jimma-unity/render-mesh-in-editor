@@ -10,10 +10,22 @@ public class RenderMeshInSceneView : MonoBehaviour
     private Material material;
     private Toggle toggle;
 
-    public void Setup(Material mat)
+    // Hacky way to grab material, improve
+    #region 
+    Material LoadMaterial()
+    {
+        GameObject go = (GameObject)Instantiate(Resources.Load("VertexColorCube"));
+        Material mat = new Material(go.GetComponent<Renderer>().sharedMaterial);
+        mat.enableInstancing = true;
+        DestroyImmediate(go);
+        return mat;
+    }
+    #endregion
+
+    public void Setup()
     {
         mesh = CreateMesh.CreatePlane();
-        material = mat;
+        material = LoadMaterial();
         // This doesn't work (if you assign a material to a GameObject in-editor it works, if you create it in script here it doesn't).
         // Seems to be a bug when you create a Material in script this way.
         //Shader shader = Shader.Find("Shader Graphs/VertexColor");
@@ -32,7 +44,7 @@ public class RenderMeshInSceneView : MonoBehaviour
     }
     public void CreateGUI(VisualElement rootVisualElement)
     {
-        Debug.Log("RMISV::CreateGUI()");
+        //Debug.Log("RMISV::CreateGUI()");
         toggle = new Toggle("Render Mesh") { name = "RenderMesh" };
         toggle.value = true;
         toggle.RegisterValueChangedCallback(OnToggleValueChanged);
@@ -68,9 +80,10 @@ public class RenderMeshInSceneView : MonoBehaviour
 
     void OnDrawGizmos()
     {
-        if (toggle != null && toggle.value && mesh != null && material != null)
+        if (toggle == null || mesh == null || material == null) return;
+        if (toggle.value)
         {
-            material.SetPass(0);
+            material.SetPass(0); // Necessary when calling DrawMeshNow
             Graphics.DrawMeshNow(mesh, Vector3.zero, Quaternion.identity);
         }
     }
